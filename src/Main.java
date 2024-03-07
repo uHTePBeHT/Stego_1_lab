@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String imagePath = "src/image.png"; //Ссылка на изображение-шаблон
         String message = "!Vladislav Lavrenko!"; //Сообщение
         String outputImagePath = "src/outputImage.png"; //Ссылка на изображение с сообщением
@@ -17,6 +17,18 @@ public class Main {
 
         String answer = extractMessage(outputImagePath);
         System.out.println("Extracted message: " + answer);
+
+        // Норма Минковского
+        double minkowskiNorm = calculateMinkowskiNorm(imagePath, outputImagePath);
+        System.out.println("Minkowski norm = " + minkowskiNorm);
+
+        // Среднее квадратичное отклонение MSE
+        double mse = calculateMSE(imagePath, outputImagePath);
+        System.out.println("MSE = " + mse);
+
+        // Максимальное абсолютное отклонение maxD
+        int maxDeviation = calculateMaxDeviation(imagePath, outputImagePath);
+        System.out.println("Max Deviation = " + maxDeviation);
 
     }
 
@@ -124,4 +136,109 @@ public class Main {
             return null;
         }
     }
+
+    private static double calculateMinkowskiNorm(String imagePath, String outputImagePath) throws IOException {
+        BufferedImage image = ImageIO.read(new File(imagePath));
+        BufferedImage outputImage = ImageIO.read(new File(outputImagePath));
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int totalPixels = width * height;
+        int p = 2;
+
+        double sum = 0;
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                int originalPixel = image.getRGB(i, j);
+                int extractedPixel = outputImage.getRGB(i, j);
+
+                int originalRed = (originalPixel >> 16) & 0xFF;
+                int originalGreen = (originalPixel >> 8) & 0xFF;
+                int originalBlue = originalPixel & 0xFF;
+
+                int extractedRed = (extractedPixel >> 16) & 0xFF;
+                int extractedGreen = (extractedPixel >> 8) & 0xFF;
+                int extractedBlue = extractedPixel & 0xFF;
+
+                double pixelDiffRed = Math.pow(Math.abs(originalRed - extractedRed), p);
+                double pixelDiffGreen = Math.pow(Math.abs(originalGreen - extractedGreen), p);
+                double pixelDiffBlue = Math.pow(Math.abs(originalBlue - extractedBlue), p);
+
+                sum += pixelDiffRed + pixelDiffGreen + pixelDiffBlue;
+            }
+        }
+
+        double norm = Math.pow(sum / totalPixels, 1.0 / p);
+        return norm;
+    }
+
+    private static double calculateMSE(String imagePath, String outputImagePath) throws IOException {
+        BufferedImage image = ImageIO.read(new File(imagePath));
+        BufferedImage outputImage = ImageIO.read(new File(outputImagePath));
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int totalPixels = width * height;
+
+        double sum = 0;
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                int originalPixel = image.getRGB(i, j);
+                int extractedPixel = outputImage.getRGB(i, j);
+
+                int originalRed = (originalPixel >> 16) & 0xFF;
+                int originalGreen = (originalPixel >> 8) & 0xFF;
+                int originalBlue = originalPixel & 0xFF;
+
+                int extractedRed = (extractedPixel >> 16) & 0xFF;
+                int extractedGreen = (extractedPixel >> 8) & 0xFF;
+                int extractedBlue = extractedPixel & 0xFF;
+
+                double pixelDiffRed = Math.pow(originalRed - extractedRed, 2);
+                double pixelDiffGreen = Math.pow(originalGreen - extractedGreen, 2);
+                double pixelDiffBlue = Math.pow(originalBlue - extractedBlue, 2);
+
+                sum += pixelDiffRed + pixelDiffGreen + pixelDiffBlue;
+            }
+        }
+
+        double mse = sum / totalPixels;
+
+        return mse;
+    }
+
+
+    private static int calculateMaxDeviation(String imagePath, String outputImagePath) throws IOException {
+        BufferedImage image = ImageIO.read(new File(imagePath));
+        BufferedImage outputImage = ImageIO.read(new File(outputImagePath));
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int maxDeviation = 0;
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                int originalPixel = image.getRGB(i, j);
+                int extractedPixel = outputImage.getRGB(i, j);
+
+                int originalRed = (originalPixel >> 16) & 0xFF;
+                int originalGreen = (originalPixel >> 8) & 0xFF;
+                int originalBlue = originalPixel & 0xFF;
+
+                int extractedRed = (extractedPixel >> 16) & 0xFF;
+                int extractedGreen = (extractedPixel >> 8) & 0xFF;
+                int extractedBlue = extractedPixel & 0xFF;
+
+                int deviationRed = Math.abs(originalRed - extractedRed);
+                int deviationGreen = Math.abs(originalGreen - extractedGreen);
+                int deviationBlue = Math.abs(originalBlue - extractedBlue);
+
+                int maxPixelDeviation = Math.max(deviationRed, Math.max(deviationGreen, deviationBlue));
+
+                maxDeviation = Math.max(maxDeviation, maxPixelDeviation);
+            }
+        }
+
+        return maxDeviation;
+    }
+
 }
