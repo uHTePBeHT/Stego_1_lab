@@ -11,25 +11,23 @@ public class Main {
         String message = "!Vladislav Lavrenko!"; //Сообщение
         String outputImagePath = "src/outputImage.png"; //Ссылка на изображение с сообщением
 
-        Scanner scanner = new Scanner(System.in);
-
-        hideMessage(imagePath, message, outputImagePath);
-
-        String answer = extractMessage(outputImagePath);
-        System.out.println("Extracted message: " + answer);
-
-        // Норма Минковского
-        double minkowskiNorm = calculateMinkowskiNorm(imagePath, outputImagePath);
-        System.out.println("Minkowski norm = " + minkowskiNorm);
-
-        // Среднее квадратичное отклонение MSE
-        double mse = calculateMSE(imagePath, outputImagePath);
-        System.out.println("MSE = " + mse);
-
-        // Максимальное абсолютное отклонение maxD
-        int maxDeviation = calculateMaxDeviation(imagePath, outputImagePath);
-        System.out.println("Max Deviation = " + maxDeviation);
-
+        showStartMenu(imagePath, message, outputImagePath);
+//        hideMessage(imagePath, message, outputImagePath);
+//
+//        String answer = extractMessage(outputImagePath);
+//        System.out.println("Extracted message: " + answer);
+//
+//        // Норма Минковского
+//        double minkowskiNorm = calculateMinkowskiNorm(imagePath, outputImagePath);
+//        System.out.println("Minkowski norm = " + minkowskiNorm);
+//
+//        // Среднее квадратичное отклонение MSE
+//        double mse = calculateMSE(imagePath, outputImagePath);
+//        System.out.println("MSE = " + mse);
+//
+//        // Максимальное абсолютное отклонение maxD
+//        int maxDeviation = calculateMaxDeviation(imagePath, outputImagePath);
+//        System.out.println("Max Deviation = " + maxDeviation);
     }
 
     private static void hideMessage(String imagePath, String message, String outputImagePath){
@@ -241,4 +239,70 @@ public class Main {
         return maxDeviation;
     }
 
+    private static void showStartMenu(String imagePath, String message, String outputImagePath) throws IOException {
+        System.out.println("----- Лабораторная работа 1 (Алгоритм LSB) -----");
+        System.out.println("Выполнил: Лавренко В.А., 10 группа, 3 курс");
+
+
+        showMenu(imagePath, message, outputImagePath);
+
+
+    }
+
+    private static void showMenu(String imagePath, String message, String outputImagePath) throws IOException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\n");
+        System.out.println("Что вы хотите сделать: ");
+        System.out.println("1. Скрыть сообщение в изображении;");
+        System.out.println("2. Достать сообщение из изображения;");
+        System.out.println("3. Скрыть и достать сообщение ( + показать метрики);");
+        System.out.println("4. Отобразить только метрики.");
+        System.out.println("Введите число: ");
+        int choice = scanner.nextInt();
+
+        switch (choice) {
+            case 1:
+                hideMessage(imagePath, message, outputImagePath);
+                showMenu(imagePath, message, outputImagePath);
+            case 2:
+                String extractedMessage = extractMessage(outputImagePath);
+                System.out.println("Извлечённое сообщение = " + extractedMessage);
+                showMenu(imagePath, message, outputImagePath);
+            case 3:
+                hideMessage(imagePath, message, outputImagePath);
+                String extractedMessage1 = extractMessage(outputImagePath);
+                System.out.println("Извлечённое сообщение = " + extractedMessage1);
+                // Норма Минковского
+                double minkowskiNorm = calculateMinkowskiNorm(imagePath, outputImagePath);
+                System.out.println("Норма Минковского = " + minkowskiNorm);
+
+                // Среднее квадратичное отклонение MSE
+                double mse = calculateMSE(imagePath, outputImagePath);
+                System.out.println("Среднее квадратичное отклонение MSE = " + mse);
+
+                // Максимальное абсолютное отклонение maxD
+                int maxDeviation = calculateMaxDeviation(imagePath, outputImagePath);
+                System.out.println("Максимальное абсолютное отклонение = " + maxDeviation);
+
+                showMenu(imagePath, message, outputImagePath);
+            case 4:
+                // Норма Минковского
+                double minkowskiNorm1 = calculateMinkowskiNorm(imagePath, outputImagePath);
+                System.out.println("Норма Минковского = " + minkowskiNorm1);
+
+                // Среднее квадратичное отклонение MSE
+                double mse1 = calculateMSE(imagePath, outputImagePath);
+                System.out.println("Среднее квадратичное отклонение MSE = " + mse1);
+
+                // Максимальное абсолютное отклонение maxD
+                int maxDeviation1 = calculateMaxDeviation(imagePath, outputImagePath);
+                System.out.println("Максимальное абсолютное отклонение = " + maxDeviation1);
+                showMenu(imagePath, message, outputImagePath);
+            case 0:
+                return;
+            default:
+                showMenu(imagePath, message, outputImagePath);
+
+        }
+    }
 }
